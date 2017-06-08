@@ -1,0 +1,111 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <title>Test</title>
+</head>
+<body>
+    <h1>Contact Tree</h1>
+    <div id="container"></div>
+ 
+    <style>
+        ul li {
+            list-style-type: none;
+        }
+
+        ul li.Group {
+            cursor: pointer;
+        }
+
+        ul li.Contact {
+            cursor: initial;
+        }
+    </style>
+
+    <script id="contactsTemplate" type="text/x-jQuery-tmpl">
+        <ul>
+            <li class="${type}" id="contact-${id}">
+                ${(hash['contact-' + id] = $item.data) && name}
+            </li>
+        </ul>
+    </script>
+ 
+    <script src="https://code.jquery.com/jquery-3.2.1.min.js" integrity="sha256-hwg4gsxgFZhOsEEamdOYGBf13FyQuiTwlAQgxVSNgt4=" crossorigin="anonymous"></script>
+    <script type="text/javascript" src="http://ajax.aspnetcdn.com/ajax/jquery.templates/beta1/jquery.tmpl.js"></script>
+ 
+    <script type="text/javascript">
+        var hash = {};
+
+        var contacts = [
+            {
+                id: 1,
+                name:"Friends",
+                type:"Group",
+                contacts: [
+                    {
+                        id: 2,
+                        name:"Udi",
+                        type:"Contact"
+                    },
+                    {
+                        id: 3,
+                        name:"Tommy",
+                        type:"Contact"
+                    },
+                    {
+                        id: 6,
+                        name:"Old Friends",
+                        type:"Group",
+                        contacts: [
+                            {
+                                id: 7,
+                                name:"Itay",
+                                type:"Contact"
+                            },
+                        ]
+                    },
+                ]
+            },
+            {
+                id: 4,
+                name:"Family",
+                type:"Group",
+                contacts: [
+                    {
+                        id: 5,
+                        name:"Roni",
+                        type:"Contact"
+                    },
+                ]
+            },
+            {
+                id: 8,
+                name:"Ori",
+                type:"Contact"
+            },
+        ];
+
+        function addClickListener(elem) {
+            $(elem).on('click', function(e) {
+                e.stopPropagation();
+                $('#contactsTemplate').tmpl(hash[e.target.id].contacts).appendTo(e.target);
+                $(e.target)
+                    .on('click', function(e) {
+                        e.stopPropagation();
+                        $(e.target).find('ul').remove();
+                        addClickListener(e.target);
+                    })
+                    .find('.Group')
+                    .each(function(index, elem) {
+                        addClickListener(elem);
+                    });
+            });
+        }
+
+        $('#contactsTemplate').tmpl(contacts).appendTo('#container');
+        $('#container').find('.Group').each(function(index, elem) {
+            addClickListener(elem);
+        });
+    </script>
+ 
+</body>
+</html>
